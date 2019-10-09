@@ -1,0 +1,182 @@
+/*Hot Air Balloon
+by Johanna Kneifel
+IAT 806 Assignment A7*/
+
+//declaring variables for lives and game status
+boolean gameOn = true;
+int life = 3;
+PShape healthBalloons;
+final int BALLOON_SIZE = 30;
+
+
+//cloud array
+Cloud[] clouds = new Cloud[8];
+
+//Storm cloud
+Storm[] sCloud = new Storm[4];
+
+//hot air balloon  
+Balloon b1 = new Balloon (mouseX, mouseY, life);
+ 
+
+void setup() 
+{
+  size(400, 400);
+ 
+  
+  healthBalloons = createShape(GROUP);                          //drawing lives (3 balloons)
+  
+  for(int i=0; i < clouds.length; i++){                         //setting up an array white clouds and having them float down the screen
+    clouds[i] = new Cloud(random(width), random(-300, -50));
+ }
+ 
+    for(int i=0; i < sCloud.length; i++){                       // setting up an array storm clouds randomly floating across the screen
+      float STspacing = random(-500, -50);
+    sCloud[i] = new Storm(random(width), STspacing );
+}}
+
+void draw() { 
+background(100,149,237);
+frameRate(80);                                           //increase or decrease to change the difficulty
+ 
+
+ b1.drawBalloon();                                       //draw the active hot air balloon
+ drawLifeBars();                                         //draw the 3 lives
+ 
+ 
+  for (int i=0; i < clouds.length; i++){                  //drawing white clouds and having them float down the screen
+    clouds[i].drawCloud();
+ }
+ 
+  for (int i=0; i < sCloud.length; i++){                 //drawing storm clouds and having them float down the screen
+    sCloud[i].drawStorm(); 
+  }
+ 
+  
+ if(life == 0) {                                //determining the amount of lives and ending the game after 3 are lost
+       gameOn=false; 
+      textSize(20);
+      fill(255,215,0);
+      text("Game Over", 150, 200); 
+      noLoop();
+  }
+}
+
+//the content of the visuals - creating 3 ballons to display and draw
+
+PShape createBalloon(PVector balloonPoint, float ellipseWidth, float ellipseHeight, float rectWidth, float rectHeight) {
+    PShape balloon = createShape(GROUP);
+    noStroke();
+    fill(128,0,128,230);
+    balloon.addChild(createShape(ELLIPSE, balloonPoint.x, balloonPoint.y, ellipseWidth, ellipseHeight));
+    rectMode(CENTER);
+    balloon.addChild(createShape(RECT, balloonPoint.x, balloonPoint.y + (ellipseHeight), rectWidth, rectHeight)); 
+    return balloon;
+}
+
+//creating a procedure for drawing the 3 lives
+
+void drawLifeBars() {
+  int distance = 20;
+   for(int i =0; i < life; i++) {
+     PShape balloon =  createBalloon(new PVector(width - 20 - (i * distance), 20), 20, 20, 6, 6);
+     shape(balloon);
+   } 
+}
+ 
+ 
+ //BALLOON CLASS
+
+class Balloon { 
+  float x, y, life; 
+    
+    Balloon (float x, float y, int life) {  
+    this.x = mouseX;
+    this.y = mouseY;  
+    this.life = 3;
+  }
+
+  void drawBalloon(){
+    shape(createBalloon(new PVector(mouseX, mouseY), 30, 30, 10, 10));
+}
+}
+
+ //CLOUD CLASS
+
+class Cloud{
+
+float xPos;
+float yPos;
+
+Cloud(float xPos, float yPos){
+  this.xPos = xPos;
+  this.yPos = yPos;
+}
+
+void drawCloud(){
+  
+     yPos += 2; 
+    
+     if (yPos>height){
+     yPos=random(-100, -200); xPos=random(-20,450);} 
+   
+    pushMatrix();    
+  
+    translate(xPos, yPos);
+    noStroke();
+    fill(225, 230);
+    ellipse(10,100,80,30);
+    ellipse(0,80,50,30);
+    ellipse(10,110,50,30);  
+    
+   popMatrix();
+
+   
+}}
+
+//STORM CLASS
+
+class Storm{
+
+float xSPos;
+float ySPos;
+boolean collisionHappened = false;
+
+Storm(float xSPos, float ySPos){
+  this.xSPos = xSPos;
+  this.ySPos = ySPos;
+}
+
+void drawStorm(){
+  
+   ySPos += 1;    
+   if (ySPos>height){
+     ySPos=random(-50, -100); 
+     xSPos=random(0,350);
+     collisionHappened = false;
+   } 
+   
+   boolean xhasCollision = mouseX >=  xSPos && mouseX <= xSPos + 100;
+   boolean yhasCollision = mouseY >= ySPos && mouseY <= ySPos + 50;
+   if(xhasCollision && yhasCollision && !this.collisionHappened) {
+     println("collison");
+     println(xSPos);
+     this.collisionHappened = true;
+    life-=1;
+  }
+       
+    noStroke();
+    fill(100, 230);
+    ellipse(xSPos, ySPos, 100,30);
+    ellipse(xSPos, ySPos, 70, 50);
+        strokeWeight(2);
+        stroke(255,255,0, 200);
+    line(xSPos+20, ySPos+20, xSPos+40, ySPos+40);
+      strokeWeight(4);
+        stroke(200,200,180,200);
+    line(xSPos+40, ySPos+30, xSPos+60, ySPos+50);
+  
+
+}
+   
+}
